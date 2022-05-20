@@ -1,0 +1,29 @@
+name: "yuki"
+dev:
+  host: "10.24.21.110"
+  post: 22
+  username: "root"
+    password: "Datayes#@!"
+  localPath: "/dist"
+  remotePath: "/usr/local/src/"
+stg:
+  host: "10.24.90.48"
+  post: 22
+  username: "root"
+    password: "Datayes#@!"
+  localPath: "/dist"
+  remotePath: "/usr/local/src/"
+qa:
+  host: "10.24.21.148"
+  post: 22
+  username: "root"
+    password: "Datayes#@!"
+  localPath: "/dist"
+  remotePath: "/usr/local/src/"
+prd:
+  host: "10.21.141.50"
+  post: 22
+  username: "root"
+  password: "Datayes#@!"
+  localPath: "/dist"
+  remotePath: "/usr/local/src/"
