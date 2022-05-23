@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func ConnectSession(user, password, host string, port int) (*ssh.Session, error) {
+func ConnectSession(host string, port int, user string, password string) (*ssh.Session, error) {
 	var (
 		auth    []ssh.AuthMethod
 		addr    string
@@ -45,13 +45,14 @@ func ConnectSession(user, password, host string, port int) (*ssh.Session, error)
 
 	return session, nil
 }
-func ConnectClient(user, password, host string, port int) (*sftp.Client, error) {
+func ConnectClient(user, password, host string, port int) (*sftp.Client, *ssh.Session, error) {
 	var (
 		auth         []ssh.AuthMethod
 		addr         string
 		clientConfig *ssh.ClientConfig
 		sshClient    *ssh.Client
 		sftpClient   *sftp.Client
+		session *ssh.Session
 		err          error
 	)
 	// get auth method
@@ -68,14 +69,17 @@ func ConnectClient(user, password, host string, port int) (*sftp.Client, error) 
 	// connet to ssh
 	addr = fmt.Sprintf("%s:%d", host, port)
 	if sshClient, err = ssh.Dial("tcp", addr, clientConfig); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// create sftp client
 	if sftpClient, err = sftp.NewClient(sshClient); err != nil {
 		return nil, err
 	}
-	return sftpClient, nil
+	if session, err = sshClient.NewSession(); err != nil {
+		return nil, nil, err
+	}
+	return sftpClient, session, nil
 }
 func UploadFile(sftpClient *sftp.Client, localFilePath string, remotePath string) {
 	srcFile, err := os.Open(localFilePath)
@@ -124,17 +128,19 @@ func UploadDirectory(sftpClient *sftp.Client, localPath string, remotePath strin
 
 	fmt.Println(localPath + "  copy directory to remote server finished!")
 }
-func DoBackup(host string, port int, userName string, password string, localPath string, remotePath string) {
+func Deploy(host string, port int, userName string, password string, localPath string, remotePath string, backupPath string) {
 	var (
 		err        error
 		sftpClient *sftp.Client
+		session *ssh.Session
 	)
 	start := time.Now()
-	sftpClient, err = ConnectClient(userName, password, host, port)
+	sftpClient, session, err = ConnectClient(userName, password, host, port)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer sftpClient.Close()
+	defer session.Close()
 
 	_, errStat := sftpClient.Stat(remotePath)
 	if errStat != nil {
@@ -146,6 +152,10 @@ func DoBackup(host string, port int, userName string, password string, localPath
 		log.Fatal(localPath + " local path not exists!")
 	}
 	UploadDirectory(sftpClient, localPath, remotePath)
+
+	session.Stdout = os.Stdout
+	session.Stderr = os.Stderr
+	_ = session.Run("zip -q -r " + backupPath + " " + remotePath) //sh 命令路径
 	elapsed := time.Since(start)
 	fmt.Println("elapsed time : ", elapsed, backupDirs)
 }

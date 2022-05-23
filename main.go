@@ -32,15 +32,11 @@ func main() {
 	username := v.Get(env + ".username").(string)
 	password := v.Get(env + ".password").(string)
 	localPath := str + v.Get(env + ".localPath").(string)
-	name := v.Get("name")
-	var remotePath string
-	if name != nil{
-		remotePath = v.Get(env + ".remotePath").(string) + name.(string)
-	} else {
-		remotePath = v.Get(env + ".remotePath").(string)
-	}
+	remotePath := v.Get(env + ".remotePath").(string) + v.Get("name").(string)
+	backupPath := v.Get(env + ".backupPath").(string) + v.Get("name").(string) + ".zip"
+
 	//fmt.Println(host, port, username, password, localPath, remotePath, str)
-	ssh_connector.DoBackup(host, port, username, password, localPath, remotePath)
+	ssh_connector.Deploy(host, port, username, password, localPath, remotePath, backupPath)
 	//session, err := ssh_connector.Connect("root", "Datayes#@!", "10.21.141.50", 22)
 	//if err != nil {
 	//	log.Fatal(err)
