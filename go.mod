@@ -7,7 +7,10 @@ require (
 	golang.org/x/crypto v0.0.0-20220518034528-6f7dac969898
 )
 
-require github.com/spf13/viper v1.11.0
+require (
+	github.com/spf13/viper v1.11.0
+	golang.org/x/text v0.3.7
+)
 
 require (
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
@@ -25,7 +28,6 @@ require (
 	github.com/subosito/gotenv v1.2.0 // indirect
 	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
-	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
